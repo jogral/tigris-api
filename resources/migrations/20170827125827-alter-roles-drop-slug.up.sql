@@ -1,0 +1,3 @@
+ALTER TABLE j_roles DROP COLUMN slug CASCADE;
+--;;
+ALTER TABLE j_permissions DROP COLUMN slug CASCADE;

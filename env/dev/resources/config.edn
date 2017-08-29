@@ -1,0 +1,12 @@
+{:dev true
+ :port 3030
+ ;; when :nrepl-port is set the application starts the nREPL server on load
+ :nrepl-port 7000}
+ :allowed-domains #"http://localhost:8080"
+ :keyfiles {:keydir "resources/.keys"
+            :pubkey "public.pem"
+            :privkey "private.pem"}
+ :ldap-settings {:address         ""
+                 :port            389
+                 :connect-timeout (* 1000 5)
+                 :timeout         (* 1000 30)}}

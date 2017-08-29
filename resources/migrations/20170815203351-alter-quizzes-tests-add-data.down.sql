@@ -1,0 +1,3 @@
+ALTER TABLE quizzes DROP COLUMN data;
+--;;
+ALTER TABLE tests DROP COLUMN data;

@@ -1,0 +1,7 @@
+{:production true
+ :port 3000}
+ ;;:allowed-domains [#""]
+ ;;:ldap-settings {:address         ""
+ ;;                :port            389
+ ;;                :connect-timeout (* 1000 5)
+ ;;                :timeout         (* 1000 30)}}
