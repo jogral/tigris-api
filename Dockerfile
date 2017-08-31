@@ -1,8 +1,23 @@
-FROM java:8-alpine
-MAINTAINER Your Name <you@example.com>
+# Set up builds of the API
+FROM clojure:lein-alpine-onbuild AS build-env
+MAINTAINER Donald Wilcox <dw@jogral.io>
 
-ADD target/uberjar/api.jar /api/app.jar
+WORKDIR /api
+COPY . /api
 
-EXPOSE 3000
+RUN ./generate_keys.sh
+RUN lein uberjar
 
-CMD ["java", "-jar", "/api/app.jar"]
+# Run the actual application
+FROM openjdk:8-jdk-alpine
+MAINTAINER Donald Wilcox <dw@jogral.io>
+
+WORKDIR /api
+RUN mkdir -p /api/resources/.keys/
+
+EXPOSE 3030
+
+COPY --from=build-env /api/target/uberjar/ .
+COPY --from=build-env /api/resources/.keys/ /api/resources/.keys/
+
+CMD ["java", "-jar", "/api/tigris-api.jar"]

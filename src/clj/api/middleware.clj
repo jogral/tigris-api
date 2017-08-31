@@ -16,18 +16,18 @@
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]])
   (:import [javax.servlet ServletContext]))
 
+;;(def passphrase (slurp (env :datph)))
 
-(def pubkey
-  (keys/public-key "resources/.keys/public.pem"))
-(def privkey
-  (keys/private-key "resources/.keys/private.pem"
-                    (str/trim (slurp "resources/.keys/dat.ph"))))
+(def pubkey (keys/public-key "resources/.keys/public.pem"))
+
+(def privkey (keys/private-key
+              "resources/.keys/private.pem"
+              (str/trim (slurp "resources/.keys/dat.ph"))))
 
 (def backend
   (backends/jwe {:secret privkey
                  :options {:alg :rsa-oaep
                            :enc :a128cbc-hs256}}))
-
 (defn wrap-context [handler]
   (fn [request]
     (binding [*app-context*

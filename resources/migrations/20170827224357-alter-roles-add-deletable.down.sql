@@ -1,1 +1,1 @@
-ALTER TABLE j_roles DROP COLUMN deletable;
+--ALTER TABLE j_roles DROP COLUMN deletable;

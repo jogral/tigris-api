@@ -1,4 +1,4 @@
-DROP VIEW quizzes_view;
+DROP VIEW IF EXISTS quizzes_view;
 --;;
 DROP TABLE tests_enrollments_rel;
 --;;

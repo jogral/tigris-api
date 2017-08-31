@@ -1,4 +1,5 @@
 create table if not exists enrollments (
+    id               SERIAL PRIMARY KEY,
     user_id          integer not null,
     course_id        integer not null,
     progress         jsonb NOT NULL,

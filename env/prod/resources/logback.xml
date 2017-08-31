@@ -25,7 +25,16 @@
     <logger name="com.zaxxer.hikari" level="warn">
         <AppenderRef ref="FILE"/>
     </logger>
+<!--    <root level="TRACE">
+        <appender-ref ref="FILE" />
+    </root>
     <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+    <root level="WARN">
+        <appender-ref ref="FILE" />
+    </root>-->
+    <root level="DEBUG">
         <appender-ref ref="FILE" />
     </root>
 </configuration>

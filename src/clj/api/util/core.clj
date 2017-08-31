@@ -24,8 +24,8 @@
           ;;                    (c/to-local-date-time (c/to-long (:exp decrypted))))]
       (= (:iss decrypted) "tigris"))
     (catch Throwable t
-      (when (:dev env)
-        (log/warn t))
+      ;;(when (:dev env)
+        (log/warn t);;)
       false)))
 
 (defn process-invitation-token

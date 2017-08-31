@@ -1,4 +1,4 @@
-ALTER TABLE enrollments DROP COLUMN user_id;
+ALTER TABLE enrollments DROP COLUMN user_id CASCADE;
 --;;
 ALTER TABLE enrollments ADD COLUMN user_id UUID NOT NULL;
 --;;

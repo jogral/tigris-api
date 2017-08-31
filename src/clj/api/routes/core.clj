@@ -13,8 +13,8 @@
   (try
     (func)
     (catch Throwable t
-      (when (:dev env)
-        (log/warn t))
+      ;;(when (:dev env)
+        (log/warn t);;)
       (respond/bad-request {:error error-msg}))))
 
 (defn validate-and-respond

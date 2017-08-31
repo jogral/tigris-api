@@ -3,6 +3,7 @@ create table if not exists j_roles (
     name        character varying(512),
     slug        character varying(512),
     description text,
+    deletable   BOOLEAN NOT NULL DEFAULT true,
     is_active   boolean not null default true
 );
 --;;

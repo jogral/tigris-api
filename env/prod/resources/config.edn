@@ -1,5 +1,8 @@
 {:production true
- :port 3000}
+ :port 3030
+ :pubkey "../../../resources/.keys/public.pem"
+ :privkey "resources/.keys/private.pem"
+ :datph "resources/.keys/dat.ph"}
  ;;:allowed-domains [#""]
  ;;:ldap-settings {:address         ""
  ;;                :port            389

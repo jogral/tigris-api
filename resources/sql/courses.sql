@@ -21,11 +21,11 @@ SELECT :i*:cols FROM courses c WHERE c.id = :id
 
 -- :name course-by-slug :? :1
 -- :doc Gets a course by a slug with option
-SELECT :i*:cols FROM courses c WHERE c.slug = :slug
+SELECT :i*:cols FROM courses c WHERE c.slug = :slug AND c.status = 1
 
 -- :name course-by-slug-like :? :*
 -- :doc Gets a course by a slug with option {:slug_like "P%"}
-SELECT :i*:cols FROM courses c WHERE c.slug LIKE :slug-like
+SELECT :i*:cols FROM courses c WHERE c.slug LIKE :slug-like AND c.status = 1
 
 -- :name recommended-courses :? :*
 -- :doc Gets recommended courses

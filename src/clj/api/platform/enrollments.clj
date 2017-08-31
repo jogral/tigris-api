@@ -28,7 +28,7 @@
   ""
   [user-id course-id progress]
   (let [has-enrollment? (enrollment-exists? user-id course-id)
-        result          (if has-enrollment?
+        result          (if-not has-enrollment?
                           (db/insert-enrollment! {:user_id user-id
                                                   :course_id course-id
                                                   :progress progress})
