@@ -20,7 +20,7 @@
 
 (defn create-quiz-log
   ""
-  [user-id quiz-id enrollment-id token]
+  [quiz-id enrollment-id token]
   (validate-and-respond
    token
    #(let [result (a/create-quiz-taken user-id quiz-id enrollment-id)]
@@ -76,10 +76,10 @@
 
 (defn retrieve-quiz-log
   ""
-  [user-id quiz-id enrollment-id token]
+  [quiz-id enrollment-id token]
   (validate-and-respond
    token
-   #(let [result (a/get-quiz-taken user-id quiz-id enrollment-id)]
+   #(let [result (a/get-quiz-taken quiz-id enrollment-id)]
       (respond/ok result))
    (str "Cannot retrieve QUIZ " quiz-id " for USER " user-id ".")))
 
@@ -121,12 +121,11 @@
 
 (defn update-quiz-log
   ""
-  [quiz-id user-id enrollment-id details token]
+  [quiz-id enrollment-id details token]
   (validate-and-respond
    token
    #(let [details (assoc details
                          :quiz_id quiz-id
-                         :user_id user-id
                          :enrollment_id enrollment-id)
           result  (a/update-quiz-progress details)]
       (respond/ok {:result result}))
@@ -144,12 +143,12 @@
 
 (defn create-test-log
   ""
-  [user-id test-id enrollment-id token]
+  [test-id enrollment-id token]
   (validate-and-respond
    token
-   #(let [result (a/create-test-taken user-id test-id enrollment-id)]
+   #(let [result (a/create-test-taken test-id enrollment-id)]
       (respond/ok {:result result}))
-   (str "Cannot start TEST " test-id " for USER " user-id)))
+   (str "Cannot start TEST " test-id ".")))
 
 (defn delete-test
   ""
@@ -200,12 +199,12 @@
 
 (defn retrieve-test-log
   ""
-  [user-id test-id enrollment-id token]
+  [test-id enrollment-id token]
   (validate-and-respond
    token
-   #(let [result (a/get-test-taken user-id test-id enrollment-id)]
+   #(let [result (a/get-test-takentest-id enrollment-id)]
       (respond/ok result))
-   (str "Cannot retrieve TEST " test-id " for USER " user-id ".")))
+   (str "Cannot retrieve TEST " test-id ".")))
 
 (defn retrieve-tests
   ""
@@ -245,12 +244,11 @@
 
 (defn update-test-log
   ""
-  [test-id user-id enrollment-id details token]
+  [test-id enrollment-id details token]
   (validate-and-respond
    token
    #(let [details (assoc details
                          :test_id test-id
-                         :user_id user-id
                          :enrollment_id enrollment-id)
           result  (a/update-test-progress details)]
       (respond/ok {:result result}))
@@ -314,8 +312,8 @@
          :description   ""
          :header-params [authorization :- String]
          :path-params   [id :- Long]
-         :body-params   [user-id :- s/Uuid enrollment-id :- Long]
-         (create-quiz-log user-id id enrollment-id authorization))
+         :body-params   [enrollment-id :- Long]
+         (create-quiz-log id enrollment-id authorization))
    (POST "/:id/evaluate" {:as request}
          :summary       ""
          :description   ""
@@ -329,7 +327,7 @@
         :header-params [authorization :- String]
         :path-params   [quiz-id :- Long user-id :- s/Uuid enrollment-id :- Long]
         :body-params   [details :- s/Any]
-        (update-quiz-log quiz-id user-id enrollment-id details authorization))))
+        (update-quiz-log quiz-id enrollment-id details authorization))))
 
 (def test-context
   "The routes for test"
@@ -370,7 +368,7 @@
         :description   ""
         :header-params [authorization :- String]
         :path-params   [test-id :- Long user-id :- s/Uuid enrollment-id :- Long]
-        (retrieve-test-log user-id test-id enrollment-id authorization))
+        (retrieve-test-log test-id enrollment-id authorization))
    (PATCH "/:id" {:as request}
           :summary       ""
           :description   ""
@@ -389,8 +387,8 @@
          :description   ""
          :header-params [authorization :- String]
          :path-params   [id :- Long]
-         :body-params   [user-id :- s/Uuid enrollment-id :- Long]
-         (create-test-log user-id id enrollment-id authorization))
+         :body-params   [enrollment-id :- Long]
+         (create-test-log enrollment-id authorization))
    (POST "/:id/evaluate" {:as request}
          :summary       ""
          :description   ""
@@ -404,4 +402,4 @@
         :header-params [authorization :- String]
         :path-params   [test-id :- Long user-id :- s/Uuid enrollment-id :- Long]
         :body-params   [details :- s/Any]
-        (update-test-log test-id user-id enrollment-id details authorization))))
+        (update-test-log test-id enrollment-id details authorization))))

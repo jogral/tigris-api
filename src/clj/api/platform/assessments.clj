@@ -66,8 +66,8 @@
 
 (defn create-quiz-taken
   ""
-  [user-id quiz-id enrollment-id]
-  (let [result (db/insert-quiz-taken! {:user_id user-id :enrollment_id enrollment-id :quiz_id quiz-id})]
+  [quiz-id enrollment-id]
+  (let [result (db/insert-quiz-taken! {:enrollment_id enrollment-id :quiz_id quiz-id})]
     result))
 
 (defn destroy-quiz
@@ -87,7 +87,7 @@
   [id submission course-id module-id]
   (let [quiz     (db/get-quiz {:id id :cols quiz-cols})
         type     (.toLowerCase (get-in quiz [:data :type]))
-        answer   (get-in quiz [:data :answer])
+        answer   (.toUpperCase (get-in quiz [:data :answer]))
         choice   (parse-choice submission type)
         correct? (= answer choice)
         slug     (if correct?
@@ -152,8 +152,8 @@
 (defn update-quiz-progress
   ""
   [details]
-  (let [details (dissoc details :user_id :enrollment_id :test_id)
-        result  (db/update-quiz-taken! {:updates details})]
+  (let [data    (dissoc details :user_id :enrollment_id :quiz_id)
+        result  (db/update-quiz-taken! {:updates data :enrollment_id (:enrollment_id details) :quiz_id (:quiz_id details)})]
     result))
 
 ;; -- TESTS --
@@ -166,9 +166,8 @@
 
 (defn create-test-taken
   ""
-  [user-id test-id enrollment-id]
-  (let [result (db/insert-test-taken! {:user_id user-id
-                                       :test_id test-id
+  [test-id enrollment-id]
+  (let [result (db/insert-test-taken! {:test_id test-id ;;:user_id user-id
                                        :enrollment_id enrollment-id})]
     result))
 

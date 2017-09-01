@@ -10,6 +10,7 @@
    "name"
    "description"
    "is_active"
+   "deletable"
    "permissions"])
 
 (defn activate
