@@ -23,9 +23,9 @@
   [quiz-id enrollment-id token]
   (validate-and-respond
    token
-   #(let [result (a/create-quiz-taken user-id quiz-id enrollment-id)]
+   #(let [result (a/create-quiz-taken quiz-id enrollment-id)]
       (respond/ok {:result result}))
-   (str "Cannot start QUIZ " quiz-id " for USER " user-id)))
+   (str "Cannot start QUIZ " quiz-id ".")))
 
 (defn delete-quiz
   ""
@@ -81,7 +81,7 @@
    token
    #(let [result (a/get-quiz-taken quiz-id enrollment-id)]
       (respond/ok result))
-   (str "Cannot retrieve QUIZ " quiz-id " for USER " user-id ".")))
+   (str "Cannot retrieve QUIZ " quiz-id ".")))
 
 (defn retrieve-quizzes
   ""
@@ -202,7 +202,7 @@
   [test-id enrollment-id token]
   (validate-and-respond
    token
-   #(let [result (a/get-test-takentest-id enrollment-id)]
+   #(let [result (a/get-test-taken test-id enrollment-id)]
       (respond/ok result))
    (str "Cannot retrieve TEST " test-id ".")))
 
@@ -293,7 +293,7 @@
         :description   ""
         :header-params [authorization :- String]
         :path-params   [quiz-id :- Long user-id :- s/Uuid enrollment-id :- Long]
-        (retrieve-quiz-log user-id quiz-id enrollment-id authorization))
+        (retrieve-quiz-log quiz-id enrollment-id authorization))
    (PATCH "/:id" {:as request}
           :summary       ""
           :description   ""
