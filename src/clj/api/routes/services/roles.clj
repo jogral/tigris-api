@@ -3,6 +3,7 @@
   (:require
    [api.auth.role :as role]
    [api.routes.core :refer [validate-and-respond]]
+   [clojure.set :refer [difference intersection]]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
    [compojure.api.sweet :refer [context DELETE GET OPTIONS PATCH POST]]
@@ -83,9 +84,15 @@
   [id fields token]
   (validate-and-respond
    token
-   #(respond/ok {:result (role/modify id fields)})
-   (str "Cannot update ROLE "
-        (or id "[undefined]"))))
+   #(let [perm-ids     (set (:permissions fields))
+          old-perm-ids (into #{} (map (fn [x] (:id x)) (role/find-permissions id)))
+          perm-ids     (difference perm-ids (intersection perm-ids old-perm-ids))
+          old-perm-ids (difference old-perm-ids (intersection perm-ids old-perm-ids))
+          _            (when (not (empty? old-perm-ids)) (role/delete-role-permissions id old-perm-ids))
+          _            (when (not (empty? perm-ids)) (role/create-role-permissions id perm-ids))
+          result       (role/modify id (dissoc fields :permissions))]
+        (respond/ok {:result result}))
+   (str "Cannot update ROLE " (or id "[undefined]"))))
 
 ;:query-params [active :- Boolean]
 (def role-context

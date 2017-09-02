@@ -34,7 +34,7 @@ WHERE c.status = 1
 ORDER BY random()
 LIMIT 4
 
--- :name insert-course! :! :n
+-- :name insert-course! :<!
 -- :doc Adds a course
 INSERT INTO courses (title,
                     slug,

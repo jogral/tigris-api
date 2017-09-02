@@ -24,7 +24,7 @@ WHERE e.user_id = :user_id
 AND e.course_id = :course_id
 AND e.is_enrolled = true
 
--- :name insert-enrollment! :! :n
+-- :name insert-enrollment! :<!
 -- :doc Adds a enrollment
 INSERT INTO enrollments (user_id,
                          course_id,

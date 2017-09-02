@@ -58,7 +58,8 @@
 (defn create
   ""
   [course]
-  (let [id     (query/insert-course! course)
+  (let [result (first (query/insert-course! course))
+        id     (:id result)
         course (query/course-by-id {:cols course-cols :id id})]
     course))
 

@@ -31,7 +31,8 @@
    "enrollment_id"
    "score"
    "submission"
-   "date_taken"])
+   "date_taken"
+   "date_completed"])
 
 (defn- parse-choice
   "Parses selected choice"
@@ -126,8 +127,8 @@
 
 (defn get-quiz-taken
   ""
-  [user-id quiz-id enrollment-id]
-  (let [result (db/get-quiz-taken {:user_id user-id :enrollment_id enrollment-id :quiz_id quiz-id :cols quiz-view-cols})]
+  [quiz-id enrollment-id]
+  (let [result (db/get-quiz-taken {:enrollment_id enrollment-id :quiz_id quiz-id :cols quiz-view-cols})]
     result))
 
 (defn get-quizzes-taken-by-user
@@ -205,7 +206,7 @@
                    (format "%.2f"
                            (* 100.0
                               (/ (count (filter (fn [x] (:correct x)) results))
-                                 3))))
+                                 (count questions)))))
         _ (println score)]
     {:score score :results (vec results)}))
 
@@ -235,9 +236,8 @@
 
 (defn get-test-taken
   ""
-  [user-id test-id enrollment-id]
-  (let [result (db/get-test-taken {:user_id user-id
-                                   :test_id test-id
+  [test-id enrollment-id]
+  (let [result (db/get-test-taken {:test_id test-id
                                    :enrollment_id enrollment-id
                                    :cols test-view-cols})]
     result))

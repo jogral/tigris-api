@@ -27,6 +27,12 @@ where id = :id
 delete from j_roles
 where id = :id
 
+-- :name delete-role-rel! :! :n
+-- :doc Deletes a relation with a role
+DELETE FROM j_role_rights
+WHERE role_id = :role_id
+AND permission_id = :permission_id
+
 -- :name get-roles :? :*
 -- :doc gets roles
 select :i*:cols from roles_view

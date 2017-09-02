@@ -82,8 +82,7 @@ WHERE q.enrollment_id = :id
 -- :name get-quiz-taken :? :1
 -- :doc Gets a quiz taken for a specific quiz and enrollment
 SELECT :i*:cols FROM quizzes_view q
-WHERE user_id = :user_id
-AND enrollment_id = :enrollment_id
+WHERE enrollment_id = :enrollment_id
 AND quiz_id = :quiz_id
 
 -- :name delete-quiz! :! :n
@@ -179,8 +178,7 @@ WHERE t.enrollment_id = :id
 -- :name get-test-taken :? :1
 -- :doc Gets a test taken for a specific quiz and enrollment
 SELECT :i*:cols FROM tests_view t
-WHERE user_id = :user_id
-AND enrollment_id = :enrollment_id
+WHERE enrollment_id = :enrollment_id
 AND test_id = :test_id
 
 -- :name delete-test! :! :n

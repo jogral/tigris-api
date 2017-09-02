@@ -388,7 +388,7 @@
          :header-params [authorization :- String]
          :path-params   [id :- Long]
          :body-params   [enrollment-id :- Long]
-         (create-test-log enrollment-id authorization))
+         (create-test-log id enrollment-id authorization))
    (POST "/:id/evaluate" {:as request}
          :summary       ""
          :description   ""

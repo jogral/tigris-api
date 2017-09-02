@@ -43,6 +43,16 @@
   [id]
   (db/delete-role! {:id id}))
 
+(defn delete-role-permission
+  "Deletes a permission from a role."
+  [role-id perm-id]
+  (db/delete-role-rel! {:role_id role-id :permission_id perm-id}))
+
+(defn delete-role-permissions
+  "Deletes permissions from a role."
+  [role-id perm-ids]
+  (doseq [p perm-ids] (delete-role-permission role-id p)))
+
 (defn find-one
   "Gets a role by role ID"
   [id]
@@ -61,4 +71,4 @@
 (defn modify
   "Updates a role."
   [id fields]
-  (db/update-role! {:id id :fields fields}))
+  (db/update-role! {:id id :updates fields}))
