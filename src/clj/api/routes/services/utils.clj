@@ -4,6 +4,8 @@
    [api.auth.user :as user]
    [api.routes.core :refer [respond-or-catch validate-and-respond]]
    [api.util.core :as util]
+   [clojure.string :as str]
+   [clojure.tools.logging :as log]
    [compojure.api.sweet :refer [context DELETE GET PATCH POST PUT]]
    [ring.util.http-response :as respond]
    [schema.core :as s]
@@ -58,6 +60,21 @@
     (respond/ok {:result result}))
   "Cannot finalize USER."))
 
+(defn reset-password-token
+  "Creates an invitation token."
+  [email message]
+  (respond-or-catch
+   #(let [user  (user/find-one-by-col "email" email)
+          token (util/generate-invitation-token (:id user) email 8)
+          _     (when (not (nil? user))
+                  (sg/send-email {:api-token api-token
+                                  :from "no-reply@jogral.io"
+                                  :to (:email user)
+                                  :subject (:subject message)
+                                  :message (str/replace (:body message) #"\[token\]" token)}))]
+     (respond/ok {:token token}))
+   "Cannot create token."))
+
 (def util-context
   ""
   (context
@@ -75,6 +92,11 @@
          :header-params [authorization :- String]
          :body-params   [id :- s/Uuid email :- String]
          (invitation-token id email authorization))
+   (POST "/reset-password" {:as request}
+         :summary     "Resets a password."
+         :description "Creates a JWT to reset a password."
+         :body-params [email :- String message :- s/Any]
+         (reset-password-token email message))
    (POST "/send-email" {:as request}
          :summary       "Sends an email."
          :description   "Sends an email with to, subject, and message provided."

@@ -44,7 +44,7 @@
     (let [decoded  (String. (b64/decode (.getBytes token)))
           unsigned (process-invitation-token decoded)
           expired? (t/after? (c/to-local-date-time (t/now))
-                             (c/to-local-date-time (t/plus (c/from-long (c/to-long (:iat unsigned))) (t/hours 24))))]
+                             (c/to-local-date-time (c/to-long (:exp unsigned))))]
       {:valid? expired? :id (:id unsigned) :email (:email unsigned)})
     (catch Throwable t
       (when (:dev env)
@@ -53,14 +53,17 @@
 
 (defn generate-invitation-token
   "Generate an invite confirmation token."
-  [id email]
-  (let [token     {:id    id
-                   :email email
-                   :iss   "tigris"
-                   :iat   (t/now)}
-        signed (jwt/sign token privkey {:alg :rs256})
-        encoded (String. (b64/encode (.getBytes signed)) "UTF-8")]
-    encoded))
+  ([id email]
+   (generate-invitation-token id email 24))
+  ([id email time]
+   (let [token   {:id    id
+                  :email email
+                  :iss   "tigris"
+                  :iat   (t/now)
+                  :exp   (t/plus (t/now) (t/hours time))}
+         signed  (jwt/sign token privkey {:alg :rs256})
+         encoded (String. (b64/encode (.getBytes signed)) "UTF-8")]
+     encoded)))
 
 (defn generate-token
   "Generate a user JWT."

@@ -73,8 +73,10 @@
 (defn find-one-by-col
   "Gets a user by unique column (email or shortname)."
   [col val]
-  (let [col  (if (or (not= col "shortname") (not= col "email")) "shortname" col)
-        user (db/get-user-by-col {:cols user-cols :search_col col :val val})
+  (let [col  (if (and (not= col "shortname") (not= col "email")) "shortname" col)
+        user (if (= col "email")
+               (db/get-user-by-email {:cols user-cols :val val})
+               (db/get-user-by-shortname {:cols user-cols :val val}))
         user (when (not (nil? user))
                (assoc user :enrollments (retrieve-enrollments-by-user (:id user))))]
     user))

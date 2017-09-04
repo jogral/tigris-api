@@ -39,10 +39,15 @@ WHERE id = :id
 -- :doc retrieve active users.
 SELECT :i*:cols FROM users_view
 
--- :name get-user-by-col :? :1
+-- :name get-user-by-email :? :1
 -- :doc Gets a user by a column. Returns only one, since likely using unique columns.
 SELECT :i*:cols FROM users_view
-WHERE :search_col = :val
+WHERE LOWER(email) = LOWER(:val)
+
+-- :name get-user-by-shortname :? :1
+-- :doc Gets a user by a column. Returns only one, since likely using unique columns.
+SELECT :i*:cols FROM users_view
+WHERE LOWER(shortname) = LOWER(:val)
 
 -- :name delete-user! :! :n
 -- :doc delete a user given the id
