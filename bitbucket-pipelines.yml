@@ -16,7 +16,7 @@ pipelines:
           script:
             - ./generate_keys.sh
             - lein uberjar
-            - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
+            - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD https://docker.jogral.io
             - docker build -t docker.jogral.io/tigris-api:latest
             - docker push docker.jogral.io/tigris-api:latest
             
