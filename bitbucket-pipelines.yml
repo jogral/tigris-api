@@ -15,8 +15,8 @@ pipelines:
       - step:
           script:
             - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD https://docker.jogral.io
-            - docker build -t docker.jogral.io/tigris-api:latest
-            - docker build -t docker.jogral.io/tigris-api:1.1
+            - docker build -t docker.jogral.io/tigris-api:latest .
+            - docker build -t docker.jogral.io/tigris-api:1.1 .
             - docker push docker.jogral.io/tigris-api
 options:
   docker: true
