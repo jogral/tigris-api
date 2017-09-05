@@ -9,14 +9,14 @@ pipelines:
   default:
     - step:
         script: # Modify the commands below to build your repository.
-          - ./generate_keys.sh
-          - lein uberjar
-  tags:
-    release-*:
+          - echo Hi
+  custom:
+    build-to-docker:
       - step:
           script:
             - ./generate_keys.sh
             - lein uberjar
+            - docker login --username $DOCKER_USERNAME --password $DOCKER_PASSWORD
             - docker build -t docker.jogral.io/tigris-api:latest
             - docker push docker.jogral.io/tigris-api:latest
             
