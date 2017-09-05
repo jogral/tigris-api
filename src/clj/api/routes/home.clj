@@ -13,5 +13,5 @@
 
 (defroutes home-routes
   (GET "/" [] (response/ok ""))
-  (GET "/about" [] (response/ok ""))
+  (GET "/about" [] (response/ok "")))
 
