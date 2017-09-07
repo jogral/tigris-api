@@ -1,3 +1,0 @@
-ALTER TABLE quizzes ADD COLUMN data JSONB;
---;;
-ALTER TABLE tests ADD COLUMN data JSONB;
