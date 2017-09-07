@@ -1,9 +1,11 @@
 (ns api.routes.services.utils
   "Utility routes."
   (:require
+   [api.auth.permissions :refer [admin? read-only?]]
    [api.auth.user :as user]
    [api.routes.core :refer [respond-or-catch validate-and-respond]]
    [api.util.core :as util]
+   [buddy.auth :refer [authenticated?]]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
    [compojure.api.sweet :refer [context DELETE GET PATCH POST PUT]]
@@ -87,6 +89,7 @@
         :path-params [token :- String]
         (validate-token token))
    (POST "/token" {:as request}
+         :auth-rules    admin?
          :summary       "Creates a token for inviting a user."
          :description   "Creates a JWT to use for creating a new user."
          :header-params [authorization :- String]
@@ -98,6 +101,7 @@
          :body-params [email :- String message :- s/Any]
          (reset-password-token email message))
    (POST "/send-email" {:as request}
+         :auth-rules    admin?
          :summary       "Sends an email."
          :description   "Sends an email with to, subject, and message provided."
          :header-params [authorization :- String]
@@ -109,6 +113,7 @@
          :body-params [id :- s/Uuid password :- String]
          (finalize-user id password))
    (PUT "/slugify" {:as request}
+         :auth-rules    authenticated?
          :summary       "Turns string into a slug."
          :description   "This takes a string, presumably free-text, and formats it to be URL-friendly."
          :header-params [authorization :- String]

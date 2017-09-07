@@ -2,7 +2,10 @@
   "Permissions API"
   (:require
    [api.db.core :as db]
+   [api.util.core :refer [decrypt-token]]
    [clojure.string :as str]))
+
+;; Heavily inspired by DRF
 
 (defn activate
   "Activates a permission."
@@ -38,4 +41,3 @@
   "Updates a permission."
   [id fields]
   (db/update-permission! {:id id :fields fields}))
-

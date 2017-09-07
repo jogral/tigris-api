@@ -14,12 +14,19 @@
 (def token-date-formatter (f/formatters :basic-date-time))
 (def any? (complement not-any?))
 
+(defn decrypt-token
+  "Decrypts a token"
+  [token]
+  (let [token     (str/replace token #"((?i)Bearer )" "")
+        token     (str/replace token #"((?i)Token )" "")
+        decrypted (jwt/decrypt token privkey {:alg :rsa-oaep :enc :a128cbc-hs256})]
+    decrypted))
+
 (defn valid-token?
   "Check if the token is valid or not"
   [token]
   (try
-    (let [token     (str/replace token #"((?i)Bearer )" "")
-          decrypted (jwt/decrypt token privkey {:alg :rsa-oaep :enc :a128cbc-hs256})]
+    (let [decrypted (decrypt-token token)]
           ;;expired?  (t/after? (c/to-local-date-time (t/now))
           ;;                    (c/to-local-date-time (c/to-long (:exp decrypted))))]
       (= (:iss decrypted) "tigris"))
@@ -80,6 +87,7 @@
   "Refresh a user JWT."
   [token]
   (let [token     (str/replace token #"((?i)Bearer )" "")
+        token     (str/replace token #"((?i)Token )" "")
         _         (when-not (valid-token? token)
                     (throw (Throwable. "Provided token is not valid.")))
         decrypted (jwt/decrypt token privkey {:alg :rsa-oaep :enc :a128cbc-hs256})

@@ -2,8 +2,10 @@
   (:require [api.env :refer [defaults]]
             [clojure.tools.logging :as log]
             [api.layout :refer [*app-context* error-page]]
+            [buddy.auth :refer [authenticated?]]
             [buddy.auth.backends :as backends]
             [buddy.auth.middleware :refer [wrap-authentication]]
+            [buddy.auth.accessrules :refer [wrap-access-rules]]
             [buddy.sign.jwe :as jwe]
             [buddy.core.keys :as keys]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]
@@ -28,6 +30,13 @@
   (backends/jwe {:secret privkey
                  :options {:alg :rsa-oaep
                            :enc :a128cbc-hs256}}))
+
+(defn on-error [request response]
+  {:status  403
+   :headers {"Content-Type" "text/plain"}
+   :body    (str "Access to " (:uri request) " is not authorized")})
+
+
 (defn wrap-context [handler]
   (fn [request]
     (binding [*app-context*

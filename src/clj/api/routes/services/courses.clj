@@ -1,6 +1,7 @@
 (ns api.routes.services.courses
   "The routes for the Courses section"
   (:require
+   [api.auth.permissions :refer [admin? read-only?]]
    [api.platform.courses :as courses]
    [api.platform.modules :as modules]
    [api.routes.core :refer [validate-and-respond]]
@@ -140,6 +141,7 @@
   (context
    "/api/courses"
    []
+   :auth-rules {:or [admin? read-only?]}
    :tags ["course"]
    (DELETE "/:id"       {:as request}
            :summary     ""

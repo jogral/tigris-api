@@ -1,11 +1,14 @@
 (ns api.routes.services.assessments
   "Routes for the Assessments API"
   (:require
+   [api.auth.permissions :refer [admin? read-only? assessment-owner?]]
    [api.platform.assessments :as a]
    [api.routes.core :refer [validate-and-respond]]
+   [buddy.auth :refer [authenticated?]]
    [compojure.api.sweet :refer [context DELETE GET PATCH POST PUT]]
    [ring.util.http-response :as respond]
-   [schema.core :as s]))
+   [schema.core :as s]
+   api.routes.restructure))
 
 ;; -- QUIZZES --
 
@@ -259,20 +262,24 @@
   (context
    "/api/quizzes"
    []
+   ;;:auth-rules: {:or [admin? assessment-owner?]}
    :tags ["quiz"]
    (DELETE "/:id" {:as request}
+           :auth-rules admin?
            :summary       ""
            :description   ""
            :header-params [authorization :- String]
            :path-params   [id :- Long]
            (delete-quiz id authorization))
    (DELETE "/:quiz-id/enrollments/:enrollment-id" {:as request}
+           :auth-rules admin?
            :summary       ""
            :description   ""
            :header-params [authorization :- String]
            :path-params   [quiz-id :- Long enrollment-id :- Long]
            (delete-quiz-log quiz-id enrollment-id authorization))
    (GET "/" {:as request}
+        :auth-rules    authenticated?
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
@@ -283,18 +290,21 @@
           (not (nil? enrollment-id)) (retrieve-quizzes-log-by-enrollment enrollment-id authorization)
           :else                      (retrieve-quizzes authorization)))
    (GET "/:id" {:as request}
+        :auth-rules    authenticated?
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
         :path-params   [id :- Long]
         (retrieve-quiz id authorization))
    (GET "/:quiz-id/users/:user-id/enrollments/:enrollment-id" {:as request}
+        :auth-rules    {:or [admin? assessment-owner?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
         :path-params   [quiz-id :- Long user-id :- s/Uuid enrollment-id :- Long]
         (retrieve-quiz-log quiz-id enrollment-id authorization))
    (PATCH "/:id" {:as request}
+          :auth-rules admin?
           :summary       ""
           :description   ""
           :header-params [authorization :- String]
@@ -302,12 +312,14 @@
           :body-params   [details :- s/Any]
           (update-quiz id details authorization))
    (POST "/" {:as request}
+         :auth-rules admin?
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
          :body-params   [course-id :- Long module-id :- Long status :- Long details :- s/Any]
          (create-quiz course-id module-id status details authorization))
    (POST "/:id" {:as request}
+         :auth-rules    {:or [admin? assessment-owner?]}
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
@@ -315,6 +327,7 @@
          :body-params   [enrollment-id :- Long]
          (create-quiz-log id enrollment-id authorization))
    (POST "/:id/evaluate" {:as request}
+         :auth-rules    authenticated?
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
@@ -322,6 +335,7 @@
          :body-params   [course-id :- Long module-id :- Long submission :- s/Any]
          (evaluate-quiz id submission course-id module-id authorization))
    (PUT "/:quiz-id/users/:user-id/enrollments/:enrollment-id" {:as request}
+        :auth-rules    {:or [admin? assessment-owner?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
@@ -336,18 +350,21 @@
    []
    :tags ["test"]
    (DELETE "/:id" {:as request}
+           :auth-rules admin?
            :summary       ""
            :description   ""
            :header-params [authorization :- String]
            :path-params   [id :- Long]
            (delete-test id authorization))
    (DELETE "/:test-id/enrollments/:enrollment-id" {:as request}
+           :auth-rules admin?
            :summary       ""
            :description   ""
            :header-params [authorization :- String]
            :path-params   [test-id :- Long enrollment-id :- Long]
            (delete-test-log test-id enrollment-id authorization))
    (GET "/" {:as request}
+        :auth-rules    authenticated?
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
@@ -358,18 +375,21 @@
           (not (nil? enrollment-id)) (retrieve-tests-log-by-enrollment enrollment-id authorization)
           :else                                   (retrieve-tests authorization)))
    (GET "/:id" {:as request}
+        :auth-rules    authenticated?
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
         :path-params   [id :- Long]
         (retrieve-test id authorization))
    (GET "/:test-id/users/:user-id/enrollments/:enrollment-id" {:as request}
+        :auth-rules    {:or [admin? assessment-owner?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
         :path-params   [test-id :- Long user-id :- s/Uuid enrollment-id :- Long]
         (retrieve-test-log test-id enrollment-id authorization))
    (PATCH "/:id" {:as request}
+          :auth-rules admin?
           :summary       ""
           :description   ""
           :header-params [authorization :- String]
@@ -377,12 +397,14 @@
           :body-params   [details :- s/Any]
           (update-test id details authorization))
    (POST "/" {:as request}
+         :auth-rules admin?
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
          :body-params   [course-id :- Long status :- Long details :- s/Any]
          (create-test course-id status details authorization))
    (POST "/:id" {:as request}
+         :auth-rules    {:or [admin? assessment-owner?]}
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
@@ -390,6 +412,7 @@
          :body-params   [enrollment-id :- Long]
          (create-test-log id enrollment-id authorization))
    (POST "/:id/evaluate" {:as request}
+         :auth-rules    authenticated?
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
@@ -397,6 +420,7 @@
          :body-params   [submission :- s/Any]
          (evaluate-test id submission authorization))
    (PUT "/:test-id/users/:user-id/enrollments/:enrollment-id" {:as request}
+        :auth-rules    {:or [admin? assessment-owner?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]

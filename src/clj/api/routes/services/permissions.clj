@@ -2,6 +2,7 @@
   "Routes for the Permissions API"
   (:require
    [api.auth.permission :as permission]
+   [api.auth.permissions :refer [admin? read-only?]]
    [api.routes.core :refer [validate-and-respond]]
    [clojure.string :as str]
    [compojure.api.sweet :refer [context DELETE GET OPTIONS PATCH POST PUT]]
@@ -70,6 +71,7 @@
 (def permission-context
   "Routes for permissions."
   (context "/api/permissions" []
+           :auth-rules {:or [admin? read-only]}
            :tags ["permissions"]
            (DELETE "/:id" {:as request}
                    :summary       ""

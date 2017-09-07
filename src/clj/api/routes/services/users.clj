@@ -1,17 +1,20 @@
 (ns api.routes.services.users
   "Routes for the Users API"
   (:require
+   [api.auth.permissions :refer [admin? login? read-only?]]
    [api.auth.user :as user]
    [api.middleware :refer [pubkey]]
    [api.platform.enrollments :as enroll]
    [api.routes.core :refer [respond-or-catch validate-and-respond]]
    [api.util.core :refer [generate-token refresh-token]]
+   [buddy.auth :refer [authenticated?]]
    [buddy.sign.jwt :as jwt]
    [cheshire.core :as json]
    [clojure.string :as str]
    [compojure.api.sweet :refer [context DELETE GET OPTIONS PATCH POST PUT]]
    [ring.util.http-response :as respond]
-   [schema.core :as s]))
+   [schema.core :as s]
+   api.routes.restructure))
 
 (defn add-user
   [fields role token]
@@ -41,9 +44,9 @@
           token  (cond
                    user? (generate-token result)
                    :else nil)]
-      (respond/ok {:admin?      true
-                   :user        result
-                   :token       token}))
+      (assoc-in
+       (respond/ok {:user  result :token token})
+       [:session :identity] {:token token}))
    "Could not attempt authentication."))
 
 (defn delete-user
@@ -117,9 +120,10 @@
   [id token]
   (validate-and-respond
    token
-   #(respond/ok {:admin? true
-                 :user   (user/find-one id)
-                 :token  (refresh-token token)})
+   #(respond/ok (assoc-in
+                 {:user   (user/find-one id)
+                  :token  (refresh-token token)}
+                 [:session :identity] {:token token}))
    "Could not attempt re-authentication."))
 
 (defn update-user
@@ -168,6 +172,7 @@
 (def user-context
   "Routes for DB users."
   (context "/api/users" []
+           :auth-rules {:or [admin? login? read-only?]}
            :tags ["user"]
            (DELETE "/:id" {:as request}
                    :summary       ""
@@ -258,6 +263,11 @@
                 :path-params   [id :- s/Uuid]
                 :body-params   [fields :- s/Any]
                 (add-user-enrollment id fields authorization))
+           (POST "/logout" {:as request}
+                 :return String
+                 :summary     "Logout user session."
+                 :description "Kills a user session."
+                 (assoc (respond/ok "ok") :session nil))
            (POST "/authenticate" {:as request}
                  :summary     "Authenticate a user."
                  :description "Authenticates a user against the DB."

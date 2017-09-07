@@ -1,6 +1,7 @@
 (ns api.routes.services.roles
   "Routes for the Roles section"
   (:require
+   [api.auth.permissions :refer [admin? read-only?]]
    [api.auth.role :as role]
    [api.routes.core :refer [validate-and-respond]]
    [clojure.set :refer [difference intersection]]
@@ -98,6 +99,7 @@
 (def role-context
   "Routes for roles."
   (context "/api/roles" []
+           :auth-rules {:or [admin? read-only?]}
            :tags ["roles"]
            (DELETE "/:id" {:as request}
                    :summary       ""

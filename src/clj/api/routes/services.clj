@@ -6,8 +6,8 @@
             [api.routes.services.roles :refer [role-context]]
             [api.routes.services.users :refer [user-context]]
             [api.routes.services.utils :refer [util-context]]
-            [ring.util.http-response :refer :all]
             [compojure.api.sweet :refer :all]
+            [ring.util.http-response :refer :all]
             [schema.core :as s]))
 
 (defapi service-routes

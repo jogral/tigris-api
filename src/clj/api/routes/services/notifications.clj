@@ -1,8 +1,10 @@
 (ns api.routes.services.notifications
   "The routes for the Notifications section"
   (:require
+   [api.auth.permissions :refer [admin? recipient? sender?]]
    [api.notifications.core :as notifications]
    [api.routes.core :refer [validate-and-respond]]
+   [buddy.auth :refer [authenticated?]]
    [clojure.string :refer [blank?]]
    [compojure.api.sweet :refer [context DELETE GET PUT POST]]
    [ring.util.http-response :as respond]
@@ -99,12 +101,14 @@
    []
    :tags ["notification"]
    (DELETE "/:id"         {:as request}
+           :auth-rules    {:or [admin? sender?]}
            :summary       ""
            :description   ""
            :header-params [authorization :- String]
            :path-params   [id :- Long]
            (delete-notification id authorization))
    (GET "/"            {:as request}
+        :auth-rules    {:or [admin? recipient? sender?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
@@ -114,18 +118,21 @@
           (not (nil? sender))    (get-notifications-by-sender sender authorization)
           :else                  (get-all-notifications authorization)))
    (GET "/:id" {:as request}
+        :auth-rules    {:or [admin? recipient? sender?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]
         :path-params   [id :- Long]
         (get-notification id authorization))
    (POST "/" {:as request}
+         :auth-rules    authenticated?
          :summary       ""
          :description   ""
          :header-params [authorization :- String]
          :body-params   [notification :- s/Any {recipients []}]
          (add-notification notification recipients authorization))
    (PUT "/:id" {:as request}
+        :auth-rules    {:or [admin? sender?]}
         :summary       ""
         :description   ""
         :header-params [authorization :- String]

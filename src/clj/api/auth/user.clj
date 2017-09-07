@@ -2,7 +2,7 @@
   "Normal Tigris user API"
   (:require
    [api.auth.core :refer [valid-email?]]
-   [api.util.core :refer [any?]]
+   [api.util.core :refer [any? decrypt-token]]
    [api.config :refer [env]]
    [api.db.core :as db]
    [api.platform.enrollments :refer [retrieve-enrollments-by-user]]
@@ -133,4 +133,3 @@
                   (db/add-to-role! {:user_id user-id :role_id role-id})
                   0)]
     result))
-
