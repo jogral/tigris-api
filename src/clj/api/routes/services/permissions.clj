@@ -71,7 +71,7 @@
 (def permission-context
   "Routes for permissions."
   (context "/api/permissions" []
-           :auth-rules {:or [admin? read-only]}
+           :auth-rules {:or [admin? read-only?]}
            :tags ["permissions"]
            (DELETE "/:id" {:as request}
                    :summary       ""

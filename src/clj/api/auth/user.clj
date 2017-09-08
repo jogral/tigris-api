@@ -133,3 +133,21 @@
                   (db/add-to-role! {:user_id user-id :role_id role-id})
                   0)]
     result))
+
+(defn admin?
+  "Is user an admin?"
+  [user-id]
+  (try
+    (let [user       (find-one user-id)
+          cols       ["id"
+                      "name"
+                      "description"
+                      "is_active"
+                      "deletable"
+                      "permissions"]
+          admin-role (db/get-admin-role {:cols cols})
+          admin?     (some #(= (:id admin-role) %) (:roles user))]
+      admin?)
+    (catch Throwable t
+      (log/warn t)
+      false)))

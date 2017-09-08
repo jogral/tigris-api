@@ -41,11 +41,12 @@
   (respond-or-catch
    #(let [result (user/authenticate username password)
           user?  (not (nil? result))
+          admin? (user/admin? (:id result))
           token  (cond
                    user? (generate-token result)
                    :else nil)]
       (assoc-in
-       (respond/ok {:user  result :token token})
+       (respond/ok {:admin admin? :user result :token token})
        [:session :identity] {:token token}))
    "Could not attempt authentication."))
 
@@ -122,6 +123,7 @@
    token
    #(respond/ok (assoc-in
                  {:user   (user/find-one id)
+                  :admin  (user/admin? id)
                   :token  (refresh-token token)}
                  [:session :identity] {:token token}))
    "Could not attempt re-authentication."))
