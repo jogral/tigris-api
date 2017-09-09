@@ -3,6 +3,7 @@
   (:require
    [api.db.core :as db]
    [api.platform.courses :as course]
+   [clojure.tools.logging :as log]
    [clojure.string :as string]))
 
 (def quiz-cols
@@ -228,10 +229,11 @@
    (get-test-by-course course-id false))
   ([course-id keep-answer?]
    (let [result (db/get-test-by-course {:course_id course-id :cols test-cols})
-         test   (if-not keep-answer?
+         test   (if-not (or keep-answer? (empty? result))
                   (assoc-in result [:data :questions] ;; Strip answers
                             (vec (map #(dissoc % :answer) (get-in result [:data :questions]))))
-                  result)]
+                  result)
+         _ (log/info test)]
      test)))
 
 (defn get-test-taken

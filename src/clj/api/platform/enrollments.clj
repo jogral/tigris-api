@@ -2,7 +2,9 @@
   ""
   (:require
    [api.db.core :as db]
-   [api.platform.courses :as course]))
+   [api.platform.courses :as course]
+   [clj-time.coerce :as c]
+   [clj-time.core :as t]))
 
 (def enrollment-cols
   ""
@@ -80,6 +82,11 @@
   ""
   [enrollment-id user-id enrollment]
   (let [enrollment (dissoc enrollment :user_id :course_id :registered_on :is_enrolled)
+        enrollment (if (and
+                        (contains? enrollment :completed_on)
+                        (not (nil? (:completed_on enrollment))))
+                     (assoc enrollment :completed_on (c/to-sql-time (t/now)))
+                     enrollment)
         result     (db/update-enrollment! {:user_id user-id :id enrollment-id :updates enrollment})]
     result))
 

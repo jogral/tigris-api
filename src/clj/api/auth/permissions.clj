@@ -67,7 +67,10 @@
   (let [user-id        (get-in req [:identity :user])
         has-recipient? (contains? (req :params) :recipient)
         notification   (get-one (get-in req [:params :id]))
-        recipients     (into [] (map #(Long/parseLong %) (split (:recipients notification) ",")))
+        recipients     (try
+                         (into [] (map #(Long/parseLong %) (split (:recipients notification) #",")))
+                         (catch Throwable t
+                           nil))
         recipient      (if has-recipient?
                          (get-in req [:params :recipient])
                          (some #{user-id} recipients))
