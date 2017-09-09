@@ -102,10 +102,10 @@
 
 (defn get-course-module-by-slug
   ""
-  [slug token]
+  [course-id slug token]
   (validate-and-respond
    token
-   #(let [result (modules/retrieve-module-by-slug slug)]
+   #(let [result (modules/retrieve-module-by-slug course-id slug)]
       (respond/ok result))
    "Cannot get MODULE by slug."))
 
@@ -183,7 +183,7 @@
         :query-params  [{slug :- String nil}]
         (if (nil? slug)
           (get-course-modules id authorization)
-          (get-course-module-by-slug slug authorization)))
+          (get-course-module-by-slug id slug authorization)))
    (GET "/:course-id/modules/:module-id" {:as request}
         :summary       "Finds a module in a course."
         :description   "Find a module by id in a course."

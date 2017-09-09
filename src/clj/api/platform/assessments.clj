@@ -53,9 +53,11 @@
   "Gets next module or exam slug"
   [course-id module-id]
   (let [result (db/get-next-module-slug {:id module-id :course_id course-id})
-        slug   (if (nil? result)
-                 "exam"
-                 (:slug result))]
+        exam?  (boolean (db/get-test-by-course {:course_id course-id :cols test-cols}))
+        slug   (cond
+                 (and (nil? result) exam?)       "exam"
+                 (and (nil? result) (not exam?)) "done"
+                 :else                           (:slug result))]
     slug))
 
 ;; -- QUIZZES --
@@ -89,7 +91,8 @@
   [id submission course-id module-id]
   (let [quiz     (db/get-quiz {:id id :cols quiz-cols})
         type     (.toLowerCase (get-in quiz [:data :type]))
-        answer   (.toUpperCase (get-in quiz [:data :answer]))
+        answer   (get-in quiz [:data :answer])
+        answer   (if (instance? String answer) (.toUpperCase answer) answer)
         choice   (parse-choice submission type)
         correct? (= answer choice)
         slug     (if correct?

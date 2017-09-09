@@ -118,6 +118,6 @@
 
 (defn retrieve-module-by-slug
   ""
-  [slug]
-  (let [result (db/get-module-by-slug {:slug slug :cols module-cols})]
+  [course-id slug]
+  (let [result (db/get-module-by-slug {:course_id course-id :slug slug :cols module-cols})]
     result))
