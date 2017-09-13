@@ -1,7 +1,7 @@
-(defproject api "0.1.0-SNAPSHOT"
+(defproject api "1.1.0-SNAPSHOT"
   :description "The API for Tigris, the Enterprise Deploy for Jogral"
 
-  :url "http://example.com/FIXME"
+  :url "https://bitbucket.org/jogral/tigris-api"
 
   :dependencies [[org.postgresql/postgresql "42.1.1"]
                  [buddy "1.3.0"]
@@ -9,10 +9,12 @@
                  [clj-time "0.13.0"]
                  [clj-sendgrid "0.1.2"]
                  [com.layerware/hugsql "0.4.7"]
+                 [com.microsoft.azure/azure-storage "5.3.1"]
                  [com.onelogin/java-saml "2.0.0"]
                  [compojure "1.6.0"]
                  [conman "0.6.4"]
                  [cprop "0.1.10"]
+                 [danlentz/clj-uuid "0.1.7"]
                  [funcool/struct "1.0.0"]
                  [io.forward/sendgrid-clj "1.0"]
                  [luminus-immutant "0.2.3"]
@@ -56,6 +58,7 @@
   :plugins [[lein-cprop "1.0.3"]
             [migratus-lein "0.4.9"]
             [lein-immutant "2.1.0"]]
+
 
   :profiles
   {:uberjar {:omit-source true

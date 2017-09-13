@@ -11,6 +11,10 @@
 
 (def safe-methods #{"GET" "HEAD" "OPTIONS"})
 
+(defn allow-any?
+  "Allows anyone explicitly."
+  [req]
+  true)
 
 (defn login?
   "Checks if a user is logging in."

@@ -1,7 +1,7 @@
 (ns api.routes.services.utils
   "Utility routes."
   (:require
-   [api.auth.permissions :refer [admin? read-only?]]
+   [api.auth.permissions :refer [admin? allow-any? read-only?]]
    [api.auth.user :as user]
    [api.routes.core :refer [respond-or-catch validate-and-respond]]
    [api.util.core :as util]
@@ -9,6 +9,7 @@
    [clojure.string :as str]
    [clojure.tools.logging :as log]
    [compojure.api.sweet :refer [context DELETE GET PATCH POST PUT]]
+   [ring.swagger.upload :as upload]
    [ring.util.http-response :as respond]
    [schema.core :as s]
    [sendgrid.core :as sg]
@@ -77,6 +78,16 @@
      (respond/ok {:token token}))
    "Cannot create token."))
 
+
+(defn upload
+  "Uploads file to Azure"
+  [file]
+  (respond-or-catch
+   #(let [{:keys [tempfile filename]} file]
+      (respond/ok {:uri (util/upload-file tempfile filename)}))
+   "Cannot upload file."))
+
+
 (def util-context
   ""
   (context
@@ -88,6 +99,13 @@
         :description "Validates a token generated via email."
         :path-params [token :- String]
         (validate-token token))
+   (POST "/upload" {:as request}
+         ;;:auth-rules       allow-any?
+         :summary          "Uploads file."
+         :description      "Uploads a file to storage."
+         :multipart-params [Content-Type :- String file :- upload/TempFileUpload]
+         :middleware       [upload/wrap-multipart-params]
+         (upload file))
    (POST "/token" {:as request}
          :auth-rules    admin?
          :summary       "Creates a token for inviting a user."

@@ -9,10 +9,17 @@
    [clj-time.format :as f]
    [clojure.data.codec.base64 :as b64]
    [clojure.string :as str]
-   [clojure.tools.logging :as log]))
+   [clojure.tools.logging :as log])
+  (:import
+   [com.microsoft.azure.storage CloudStorageAccount]
+   [com.microsoft.azure.storage.blob CloudBlobClient
+                                     CloudBlobContainer
+                                     CloudBlockBlob]
+   [java.io File]))
 
 (def token-date-formatter (f/formatters :basic-date-time))
 (def any? (complement not-any?))
+(def azure-acct (CloudStorageAccount/parse "DefaultEndpointsProtocol=https;AccountName=jogralmedia;AccountKey=KFkfhmC+b8rbeABdyUp+8kbSYBK1KBtCKQCmqaEomDp3nH5atzYrA2gTrRWsZ2JXnajq3HmqiG9OJgtcSy+Svw==;EndpointSuffix=core.windows.net"))
 
 (defn decrypt-token
   "Decrypts a token"
@@ -98,5 +105,12 @@
 
 (defn upload-file
   ""
-  [file]
-  file)
+  [tempfile filename]
+  (let [container-name (if (:production env) "production" "test")
+        client         (.createCloudBlobClient azure-acct)
+        container      (.getContainerReference client container-name)
+        file-pieces    (str/split filename #"\.")
+        new-file       (File/createTempFile (first file-pieces) (str "." (last file-pieces)))
+        blob           (.getBlockBlobReference container (.getName new-file))
+        _              (.uploadFromFile blob (.getAbsolutePath tempfile))]
+    (.toString (.getSnapshotQualifiedUri blob))))
