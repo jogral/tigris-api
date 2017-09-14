@@ -13,7 +13,9 @@
 
 
 (def added (create-verb "add" "added"))
+(def completed (create-verb "complete" "completed"))
 (def failed (create-verb "failed" "failed"))
 (def initialized (create-verb "initialize" "initialized"))
 (def mastered (create-verb "mastered" "mastered"))
 (def passed (create-verb "passed" "passed"))
+(def started (create-verb "start" "started"))

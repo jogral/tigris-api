@@ -19,6 +19,7 @@
    "roles"
    "created_on"
    "last_login"
+   "avatar"
    "is_active"
    "use_sso"])
 

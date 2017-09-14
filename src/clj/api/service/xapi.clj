@@ -33,27 +33,53 @@
 
 (defn created-course
   ""
-  [user activity]
+  [user activity & timestamp]
   (let [verb {:uri         "http://activitystrea.ms/schema/1.0/create"
               :description "created"}]
-    (action user (create-verb verb) activity)))
+    (action user (create-verb verb) activity timestamp)))
+
+(defn completed
+  ""
+  [user activity & timestamp]
+  (action user verbs/completed activity timestamp))
 
 (defn enrolled-in
   ""
-  [user activity]
-  (action user verbs/initialized activity))
+  [user activity & timestamp]
+  (action user verbs/initialized activity timestamp))
 
 (defn failed
   ""
-  [user activity]
-  (action user verbs/failed activity))
+  [user activity score & timestamp]
+  (let [statement (action user verbs/failed activity timestamp)
+        statement (assoc statement :result {:score
+                                            {:scaled (/ score 100)
+                                             :raw    score
+                                             :min    0
+                                             :max    100} 
+                                            :success false
+                                            :completed true})]
+    statement))
 
 (defn mastered
   ""
-  [user activity]
-  (action user verbs/mastered activity))
+  [user activity & timestamp]
+  (action user verbs/mastered activity timestamp))
 
 (defn passed
   ""
-  [user activity]
-  (action user verbs/passed activity))
+  [user activity score & timestamp]
+  (let [statement (action user verbs/passed activity timestamp)
+        statement (assoc statement :result {:score
+                                            {:scaled (/ score 100)
+                                             :raw    score
+                                             :min    0
+                                             :max    100} 
+                                            :success true
+                                            :completed true})]
+    statement))
+
+(defn started
+  ""
+  [user activity & timestamp]
+  (action user verbs/started activity timestamp))
