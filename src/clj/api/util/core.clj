@@ -21,6 +21,9 @@
 (def any? (complement not-any?))
 (def azure-acct (CloudStorageAccount/parse "DefaultEndpointsProtocol=https;AccountName=jogralmedia;AccountKey=KFkfhmC+b8rbeABdyUp+8kbSYBK1KBtCKQCmqaEomDp3nH5atzYrA2gTrRWsZ2JXnajq3HmqiG9OJgtcSy+Svw==;EndpointSuffix=core.windows.net"))
 
+(defn rand-str [len]
+  (apply str (take len (repeatedly #(char (+ (rand 26) 65))))))
+
 (defn decrypt-token
   "Decrypts a token"
   [token]
@@ -33,10 +36,10 @@
   "Check if the token is valid or not"
   [token]
   (try
-    (let [decrypted (decrypt-token token)]
-          ;;expired?  (t/after? (c/to-local-date-time (t/now))
-          ;;                    (c/to-local-date-time (c/to-long (:exp decrypted))))]
-      (= (:iss decrypted) "tigris"))
+    (let [decrypted (decrypt-token token)
+          expired?  (t/after? (c/to-local-date-time (t/now))
+                              (c/to-local-date-time (c/to-long (:exp decrypted))))]
+      (and expired? (= (:iss decrypted) "tigris")))
     (catch Throwable t
       ;;(when (:dev env)
         (log/warn t);;)
@@ -85,8 +88,8 @@
   (let [now       (t/now)
         token     {:user (:id user)
                    :iss  "tigris"
-                   :iat  now}
-                   ;;:exp  (t/plus now (t/hours 8))}
+                   :iat  now
+                   :exp  (t/plus now (t/hours 8))}
         encrypted (jwt/encrypt token pubkey {:alg :rsa-oaep :enc :a128cbc-hs256})]
     encrypted))
 
@@ -110,7 +113,8 @@
         client         (.createCloudBlobClient azure-acct)
         container      (.getContainerReference client container-name)
         file-pieces    (str/split filename #"\.")
-        new-file       (File/createTempFile (first file-pieces) (str "." (last file-pieces)))
+        new-filename   (if (< (count (first file-pieces)) 3) (rand-str 3) (first file-pieces))
+        new-file       (File/createTempFile new-filename (str "." (last file-pieces)))
         blob           (.getBlockBlobReference container (.getName new-file))
         _              (.uploadFromFile blob (.getAbsolutePath tempfile))]
     (.toString (.getSnapshotQualifiedUri blob))))

@@ -3,7 +3,7 @@
   (:require
    [api.db.core :as db]
    [api.auth.user :as user]
-   [app.platform.assessments :as assess]
+   [api.platform.assessments :as assess]
    [api.platform.courses :as crs]
    [api.service.xapi :as xapi]
    [clojure.tools.logging :as log]
@@ -18,18 +18,18 @@
                     (:date_taken test))
         completed? (boolean (:date_completed test))
         outcome    (cond
-                     (and completed? (> (:score t) 59)) (xapi/passed
+                     (and completed? (> (:score test) 59)) (xapi/passed
                                                          user
                                                          (str "/courses/" (:slug course) "/exam")
-                                                         (:score t)
-                                                         (:date_completed t))
-                     (and completed? (< (:score t) 60)) (xapi/failed
+                                                         (:score test)
+                                                         (:date_completed test))
+                     (and completed? (< (:score test) 60)) (xapi/failed
                                                          user
                                                          (str "/courses/" (:slug course) "/exam")
-                                                         (:score t)
-                                                         (:date_completed t))
+                                                         (:score test)
+                                                         (:date_completed test))
                      :else                              nil)]
-    (into [] (filter (not (nil? %)) [start outcome]))))
+    (into [] (filter #(not (nil? %)) [start outcome]))))
 
 (defn- convert-enrollment-to-event
   ""
@@ -44,7 +44,7 @@
                      user
                      (str "/courses/" (:slug course))
                      (:registered_on enrollment))
-        tests-event (map (parse-test % user course) tests-taken)
+        tests-event (map #(parse-test % user course) tests-taken)
         end-event   (if completed? 
                       (xapi/completed
                        user
@@ -52,13 +52,13 @@
                        (:completed_on enrollment))
                       nil)
         events      [start-event tests-event end-event]]
-    (into [] (filter (not (nil? %)) events))))
+    (into [] (filter #(not (nil? %)) events))))
 
 (defn get-user-enrollment-events
   ""
   [id]
   (let [user        (user/find-one id)
         enrollments (:enrollments user)
-        events      (into [] (map (convert-enrollment-to-event user %) enrollments))]
+        events      (into [] (map #(convert-enrollment-to-event user %) enrollments))]
     events))
 
