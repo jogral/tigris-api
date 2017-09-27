@@ -30,7 +30,10 @@
    "long_description"
    "tags"
    "image"
-   "status"])
+   "status"
+   "creator"
+   "created_on"
+   "last_updated_on"])
 
 ;; Functions
 

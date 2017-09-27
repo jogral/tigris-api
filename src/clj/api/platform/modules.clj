@@ -25,7 +25,10 @@
    "slug"
    "description"
    "content"
-   "is_active"])
+   "is_active"
+   "creator"
+   "created_on"
+   "last_updated_on"])
 
 ;; Functions
 
@@ -77,7 +80,9 @@
   (let [num-courses    (count (course-modules id))
         params         {:course-id   id
                         :description (:description module)
-                        :order_index (inc num-courses)
+                        :order_index (if (contains? module :order_index)
+                                       (module :order_index)
+                                       (inc num-courses))
                         :title       (:title module)
                         :slug        (if (contains? module :slug)
                                        (:slug module)
