@@ -9,13 +9,17 @@
    [clj-time.format :as f]
    [clojure.data.codec.base64 :as b64]
    [clojure.string :as str]
-   [clojure.tools.logging :as log])
+   [clojure.tools.logging :as log]
+   [image-resizer.core :refer :all]
+   [image-resizer.format :as format])
   (:import
    [com.microsoft.azure.storage CloudStorageAccount]
    [com.microsoft.azure.storage.blob CloudBlobClient
                                      CloudBlobContainer
                                      CloudBlockBlob]
    [java.io File]))
+   ;[image-resizer.crop :refer :all]
+   ;[image-resizer.resize :refer :all])
 
 (def token-date-formatter (f/formatters :basic-date-time))
 (def any? (complement not-any?))
@@ -108,7 +112,7 @@
 
 (defn upload-file
   ""
-  [tempfile filename]
+  [tempfile filename thumbnail?]
   (let [container-name (if (:production env) "production" "test")
         client         (.createCloudBlobClient azure-acct)
         container      (.getContainerReference client container-name)
@@ -116,5 +120,12 @@
         new-filename   (if (< (count (first file-pieces)) 3) (rand-str 3) (first file-pieces))
         new-file       (File/createTempFile new-filename (str "." (last file-pieces)))
         blob           (.getBlockBlobReference container (.getName new-file))
-        _              (.uploadFromFile blob (.getAbsolutePath tempfile))]
+        _              (if thumbnail?
+                         (.uploadFromFile 
+                          blob 
+                          (format/as-file
+                           (resize-and-crop (file (.getAbsolutePath tempfile)) 400 220)
+                           (str "/tmp/" new-filename "-400x220." (last file-pieces))
+                           :verbatim))
+                         (.uploadFromFile blob (.getAbsolutePath tempfile)))]
     (.toString (.getSnapshotQualifiedUri blob))))

@@ -81,10 +81,10 @@
 
 (defn upload
   "Uploads file to Azure"
-  [file]
+  [file thumbnail?]
   (respond-or-catch
    #(let [{:keys [tempfile filename]} file]
-      (respond/ok {:uri (util/upload-file tempfile filename)}))
+      (respond/ok {:uri (util/upload-file tempfile filename thumbnail?)}))
    "Cannot upload file."))
 
 
@@ -104,8 +104,9 @@
          :summary          "Uploads file."
          :description      "Uploads a file to storage."
          :multipart-params [Content-Type :- String file :- upload/TempFileUpload]
+         :query-params     [{thumbnail :- Long 1}]
          :middleware       [upload/wrap-multipart-params]
-         (upload file))
+         (upload file (> thumbnail 0)))
    (POST "/token" {:as request}
          :auth-rules    admin?
          :summary       "Creates a token for inviting a user."
