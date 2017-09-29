@@ -17,6 +17,7 @@
                  [cprop "0.1.10"]
                  [danlentz/clj-uuid "0.1.7"]
                  [funcool/struct "1.0.0"]
+                 [image-resizer "0.1.10"]
                  [io.forward/sendgrid-clj "1.0"]
                  [luminus-immutant "0.2.3"]
                  [luminus-migrations "0.3.5"]

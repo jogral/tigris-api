@@ -8,6 +8,7 @@
    [clj-time.core :as t]
    [clj-time.format :as f]
    [clojure.data.codec.base64 :as b64]
+   [clojure.java.io :refer [file]]
    [clojure.string :as str]
    [clojure.tools.logging :as log]
    [image-resizer.core :refer :all]

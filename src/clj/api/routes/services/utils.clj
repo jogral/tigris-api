@@ -103,7 +103,7 @@
          ;;:auth-rules       allow-any?
          :summary          "Uploads file."
          :description      "Uploads a file to storage."
-         :multipart-params [Content-Type :- String file :- upload/TempFileUpload]
+         :multipart-params [file :- upload/TempFileUpload {Content-Type :- String nil}]
          :query-params     [{thumbnail :- Long 1}]
          :middleware       [upload/wrap-multipart-params]
          (upload file (> thumbnail 0)))
