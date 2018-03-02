@@ -17,7 +17,6 @@
    
 
 ;; TODO: Move to config file or env vars
-(def api-token "Bearer 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")
 
 (defn invitation-token
   "Creates an invitation token."
@@ -32,11 +31,7 @@
   [to subject message token]
   (validate-and-respond
    token
-   #(let [_ (sg/send-email {:api-token api-token
-                            :from "no-reply@jogral.io"
-                            :to to
-                            :subject subject
-                            :message message})]
+   #(let [_ (println "no")
       (respond/ok {:result "OK"}))
    "Cannot send email."))
 

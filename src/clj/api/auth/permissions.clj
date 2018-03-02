@@ -23,6 +23,13 @@
         login? (boolean (re-find #"/users/authenticate" uri))]
     login?))
 
+(defn refresh?
+  ""
+  [req]
+  (let [uri      (.toLowerCase (:uri req))
+        refresh? (and (boolean (re-find #"/users/refresh" uri)) (authenticated? req))]
+    refresh?))
+
 
 (defn read-only?
   ""
@@ -37,11 +44,20 @@
   "Is the owner changing this?"
   [req]
   (try
-    (let [decrypted  (util/decrypt-token (get-in req [:identity :token]))
-          user-id    0
-          self?      (= (:user decrypted) user-id)]
+    (let [token   (req :identity)
+          params  (if (nil? (req :path-params))
+                    {:user-id (nth (split (req :path-info) #"/") 1)}
+                    (req :path-params))
+          user-id (cond
+                    (contains? params :user-id)       (params :user-id)
+                    (contains? params :id)            (params :id)
+                    :else                             (last (split (req :uri) #"/")))
+          self?   (and
+                   (not (nil? (:user token)))
+                   (= (:user token) user-id))]
       self?)
     (catch Throwable t
+      (log/warn t)
       false)))
 
 
@@ -63,6 +79,7 @@
                          (= (:user token) user-id))]
       self?)
     (catch Throwable t
+      (log/warn t)
       false)))
 
 (defn recipient?

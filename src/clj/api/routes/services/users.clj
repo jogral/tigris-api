@@ -1,7 +1,7 @@
 (ns api.routes.services.users
   "Routes for the Users API"
   (:require
-   [api.auth.permissions :refer [admin? login? read-only?]]
+   [api.auth.permissions :refer [admin? refresh? self?]]
    [api.auth.user :as user]
    [api.middleware :refer [pubkey]]
    [api.platform.enrollments :as enroll]
@@ -139,7 +139,7 @@
                      :else                   (user/modify id fields))
           success? (if (nil? roles)
                      true
-                     (first (user/add-to-role id (first roles))))] ;; TODO: Eventually users can be in 2 groups.
+                     (user/add-to-role id (first roles)))] ;; TODO: Eventually users can be in 2 groups.
       (respond/ok {:result result :success? success?}))
    (str "Cannot update user " (or id "[undefined]"))))
 
@@ -174,21 +174,23 @@
 (def user-context
   "Routes for DB users."
   (context "/api/users" []
-           :auth-rules {:or [admin? login? read-only?]}
            :tags ["user"]
            (DELETE "/:id" {:as request}
+                   :auth-rules admin?
                    :summary       ""
                    :description   ""
                    :header-params [authorization :- String]
                    :path-params   [id :- s/Uuid]
                    (delete-user id authorization))
            (DELETE "/:user-id/enrollments/:enrollment-id" {:as request}
+                   :auth-rules admin?
                    :summary       ""
                    :description   ""
                    :header-params [authorization :- String]
                    :path-params   [user-id :- s/Uuid enrollment-id :- Long]
                 (delete-user-enrollment enrollment-id user-id authorization))
            (GET "/" {:as request}
+                :auth-rules authenticated?
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
@@ -198,18 +200,21 @@
                   (not (nil? email))     (get-user-by-col "email" email authorization)
                   :else                  (get-users authorization)))
            (GET "/:id" {:as request}
+                :auth-rules {:or [self? admin?]}
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
                 :path-params   [id :- s/Uuid]
                 (get-user id authorization))
            (GET "/:id/roles" {:as request}
+                :auth-rules {:or [self? admin?]}
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
                 :path-params   [id :- s/Uuid]
                 (get-user-roles id authorization))
            (GET "/:user-id/enrollments/:enrollment-id" {:as request}
+                :auth-rules {:or [self? admin?]}
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
@@ -220,6 +225,7 @@
 ;;                    :description   ""
 ;;                    (respond/ok {:get :post :patch :delete}))
            (PATCH "/:id" {:as request}
+                  :auth-rules {:or [self? admin?]}
                   :summary       ""
                   :description   ""
                   :header-params [authorization :- String]
@@ -227,6 +233,7 @@
                   :body-params   [fields :- s/Any action :- String {roles :- s/Any nil}]
                   (update-user action id fields roles authorization))
            (PATCH "/:user-id/enrollments/:enrollment-id" {:as request}
+                :auth-rules {:or [self? admin?]}
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
@@ -253,12 +260,14 @@
                                                                                      fields
                                                                                      authorization)))
            (POST "/" {:as request}
+                 :auth-rules admin?
                  :summary       ""
                  :description   ""
                  :header-params [authorization :- String]
                  :body-params   [fields :- s/Any role :- Long]
                  (add-user fields role authorization))
            (POST "/:id/enrollments" {:as request}
+                :auth-rules {:or [self? admin?]}
                 :summary       ""
                 :description   ""
                 :header-params [authorization :- String]
@@ -266,6 +275,7 @@
                 :body-params   [fields :- s/Any]
                 (add-user-enrollment id fields authorization))
            (POST "/logout" {:as request}
+                 :auth-rules authenticated?
                  :return String
                  :summary     "Logout user session."
                  :description "Kills a user session."
@@ -276,8 +286,9 @@
                  :body-params [username :- String password :- String]
                  (authenticate-user username password))
            (PUT "/refresh" {:as request}
-                  :summary     "Refresh the user."
-                  :description "Refresh the user token."
+                  :auth-rules refresh?
+                  :summary       "Refresh the user."
+                  :description   "Refresh the user token."
                   :header-params [authorization :- String]
                   :body-params   [id :- s/Uuid]
                   (refresh-user id authorization))))
