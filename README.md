@@ -1,21 +1,20 @@
-# api
+# Tigris
 
-generated using Luminus version "2.9.11.58"
+To start your Phoenix server:
 
-FIXME
+  * Install dependencies with `mix deps.get`
+  * Create and migrate your database with `mix ecto.create && mix ecto.migrate`
+  * Install Node.js dependencies with `cd assets && npm install`
+  * Start Phoenix endpoint with `mix phx.server`
 
-## Prerequisites
+Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
 
-You will need [Leiningen][1] 2.0 or above installed.
+Ready to run in production? Please [check our deployment guides](http://www.phoenixframework.org/docs/deployment).
 
-[1]: https://github.com/technomancy/leiningen
+## Learn more
 
-## Running
-
-To start a web server for the application, run:
-
-    lein run
-
-## License
-
-Copyright © 2017 FIXME
+  * Official website: http://www.phoenixframework.org/
+  * Guides: http://phoenixframework.org/docs/overview
+  * Docs: https://hexdocs.pm/phoenix
+  * Mailing list: http://groups.google.com/group/phoenix-talk
+  * Source: https://github.com/phoenixframework/phoenix
