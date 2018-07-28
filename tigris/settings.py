@@ -44,6 +44,7 @@ AUTHENTICATION_BACKENDS = (
 
 INSTALLED_APPS = [
     'users',
+    'corsheaders',
     'django.contrib.auth',
     'rolepermissions',
     'session',
@@ -64,6 +65,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'graphql_jwt.middleware.JSONWebTokenMiddleware',
@@ -159,3 +161,50 @@ GRAPHENE = {
 
 ROLEPERMISSIONS_MODULE = 'tigris.roles'
 # ROLEPERMISSIONS_REGISTER_ADMIN = True
+
+
+# django-cors-headers
+# https://github.com/OttoYiu/django-cors-headers
+
+CORS_ORIGIN_ALLOW_ALL = False
+
+CORS_ORIGIN_WHITELIST = (
+    'localhost:3000',
+)
+
+CORS_ORIGIN_REGEX_WHITELIST = []
+
+CORS_ALLOW_METHODS = (
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+)
+
+CORS_ALLOW_HEADERS = (
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+)
+
+CORS_EXPOSE_HEADERS = []
+
+CORS_PREFLIGHT_MAX_AGE = 86400
+
+CORS_ALLOW_CREDENTIALS = False
+
+CORS_MODEL = None
+
+CSRF_TRUSTED_ORIGINS = (
+    'localhost:3000',
+)
+
+CORS_REPLACE_HTTPS_REFERER = False

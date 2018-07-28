@@ -111,7 +111,7 @@ class ModuleNode(DjangoObjectType):
 
 
 class UpsertModule(Mutation):
-    course = relay.Node.Field(ModuleNode)
+    module = relay.Node.Field(ModuleNode)
 
     class Arguments:
         title = String(required=True)

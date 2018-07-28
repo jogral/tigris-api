@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from graphene import (
     relay,
+    Field,
     Mutation,
     ObjectType,
     String,
@@ -39,6 +40,7 @@ class CreateUser(Mutation):
     def mutate(self, info, email, password):
         user = get_user_model()(
             email=email,
+            username=email,
         )
         user.set_password(password)
         user.save()
@@ -51,6 +53,7 @@ class Mutation(ObjectType):
 
 
 class Query(ObjectType):
+    me = Field(UserNode)
     users = DjangoFilterConnectionField(UserNode)
 
     def resolve_users(self, info, **kwargs):
