@@ -1,6 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.postgres.fields import (
+    CICharField,
+)
 from django.utils.translation import ugettext_lazy as _
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -13,6 +16,11 @@ from .managers import UserManager
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+    username = CICharField(
+        verbose_name='optional username',
+        max_length=127,
+        unique=True,
+    )
     email = models.EmailField(
         verbose_name='email address',
         max_length=255,
@@ -67,3 +75,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def is_staff(self):
         return self.is_admin or self.is_superuser
+
+    def save(self, *args, **kwargs):
+        if not self.username:
+            self.username = self.email
+        super(User, self).save(*args, **kwargs)

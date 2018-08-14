@@ -170,6 +170,7 @@ CORS_ORIGIN_ALLOW_ALL = False
 
 CORS_ORIGIN_WHITELIST = (
     'localhost:3000',
+    'localhost:8000',
 )
 
 CORS_ORIGIN_REGEX_WHITELIST = []
@@ -205,6 +206,7 @@ CORS_MODEL = None
 
 CSRF_TRUSTED_ORIGINS = (
     'localhost:3000',
+    'localhost:8000',
 )
 
 CORS_REPLACE_HTTPS_REFERER = False

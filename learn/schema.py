@@ -39,6 +39,21 @@ class UpsertTag(Mutation):
         return UpsertTag(tag=tag)
 
 
+class DeleteTag(Mutation):
+    tag = relay.Node.Field(TagNode)
+
+    class Arguments:
+        name = String(required=True)
+
+    def mutate(self, info, name):
+        try:
+            tag, _ = Tag.objects.get(name=name)
+            tag.delete()
+            return DeleteTag(tag=tag)
+        except:
+            return DeleteTag(tag=None)
+
+
 class CourseNode(DjangoObjectType):
     class Meta:
         model = Course
@@ -149,6 +164,7 @@ class UpsertModule(Mutation):
 
 
 class Mutation(ObjectType):
+    delete_tag = DeleteTag.Field()
     upsert_tag = UpsertTag.Field()
     upsert_course = UpsertCourse.Field()
     upsert_module = UpsertModule.Field()
